@@ -1,0 +1,77 @@
+.ly_event_plugin {
+    font-family: sans-serif;
+}
+
+:root{
+    --vanilla-calendar-bg-color:#fff;
+    --vanilla-calendar-border-radius:5px;
+    --vanilla-calendar-border-color:#e7e9ed;
+    --vanilla-calendar-today-bg-color:#e7e9ed;
+    --vanilla-calendar-today-color:#333;
+    --vanilla-calendar-selected-bg-color:#0BA5AA;
+    --vanilla-calendar-selected-color:#fff;
+    --vanilla-calendar-selected-radius:5px
+}
+
+    div.vanilla-calendar-header__label {
+        font-weight: 200 !important;
+    }
+    div.vanilla-calendar-date {
+        font-size: 14px !important;
+    }
+    div.vanilla-calendar-week > span {
+        font-weight: 300 !important;
+    }
+    #ly_description_modal {
+        width: 500px;
+        height: 400px;
+        top: 50%;
+        left: 50%;
+        margin-top: -200px; /* Negative half of height. */
+        margin-left: -250px; /* Negative half of width. */
+        background-color: white;
+        overflow: initial;
+        padding: 40px;
+        box-shadow: 0 7px 29px 0 rgba(100, 100, 111, .2);
+        border-radius: 3px;
+    }
+    #ly_description_modal > p {
+        max-height: 260px;
+        overflow: scroll;
+    }
+
+    .ly_desc_readmore {
+        color: var(--vanilla-calendar-selected-bg-color);
+    }
+
+    @media (max-width: 475px) {
+        #ly_description_modal {
+            width: 300px;
+            height: 600px;
+            margin-top: -300px; /* Negative half of height. */
+            margin-left: -150px; /* Negative half of width. */
+            padding: 25px;
+            align-items: center;
+            justify-content: center;
+        }
+        #ly_description_modal > p {
+            max-height: 490px;
+        }
+        .ly_teacher_duration {
+            position: static;
+            text-align: left !important;
+        }
+        .ly_signup_button {
+            position: static;
+            display: block;
+            margin-top: 20px !important;
+            text-align: center;
+            width: 100%;
+        }
+        #ly_plugin_reset_button{
+            display: block;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
