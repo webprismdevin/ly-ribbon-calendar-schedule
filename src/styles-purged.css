@@ -479,6 +479,10 @@ img {
   display: none;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
 .w-full {
   width: 100%;
 }
@@ -642,7 +646,6 @@ img {
     box-shadow: 0 4px 22px 0 rgba(0, 0, 0, 0.05);
     margin: 0 auto;
     overflow: hidden;
-    width: 350px;
 }
 @media (max-width:1200px) {
     .vanilla-calendar {

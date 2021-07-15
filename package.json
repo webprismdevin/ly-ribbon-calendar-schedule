@@ -11,7 +11,7 @@
     "start": "watchify ./src/index.js -o bundle.js -v -s bundle",
     "build": "browserify ./src/index.js | uglifyjs > ./disti/main.js",
     "css-compile": "cat ./src/css/* > ./src/style_bundle.css",
-    "css-purge": "purgecss --css ./src/style_bundle.css --content ./src/index.js ./src/vendor/vanilla-calendar.js ./src/components/*.js --output ./src/styles-purged.css",
+    "css-purge": "purgecss --css ./src/style_bundle.css --content ./src/index.js ./src/vendor/vanilla-calendar.js ./src/components/*.js --safelist w-1\/2 --output ./src/styles-purged.css",
     "css-minify": "minify ./src/styles-purged.css > ./disti/styles-min.css"
   },
   "author": "",
