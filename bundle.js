@@ -2111,6 +2111,17 @@ Object.defineProperties(naturalCompare, {
 module.exports = naturalCompare;
 
 },{}],24:[function(require,module,exports){
+const createListStructure = () => {
+    let listHTML = document.createElement("ul");
+    listHTML.classList.add("list");
+
+    document.getElementById("ly_event_plugin").appendChild(listHTML);
+}
+
+module.exports = {
+    createListStructure: createListStructure
+}
+},{}],25:[function(require,module,exports){
 var LineClamp = require("@tvanc/lineclamp");
 
 const buildModal = () => {
@@ -2132,8 +2143,10 @@ const showModal = (data) => {
     
     let description = document.createElement("p");
     description.innerHTML = data;
+    description.id = "ly_event_description_1"
 
-    modal.appendChild(description);
+    let does_desc_exist = document.getElementById("ly_event_description_1");
+
 
     let closeButton = document.createElement("button");
     closeButton.innerHTML = "&times; close";
@@ -2143,7 +2156,12 @@ const showModal = (data) => {
         destroyModal();
     });
 
-    modal.appendChild(closeButton);
+    //check if the modal content already exists. Stops "double click" on "read more..."
+    if(does_desc_exist === null){
+        modal.appendChild(description);
+        modal.appendChild(closeButton);
+    }
+
 }
 
 const clampDescriptions = () => {
@@ -2177,7 +2195,7 @@ module.exports = {
     clampDescriptions: clampDescriptions
     // showModal: showModal
 }
-},{"@tvanc/lineclamp":1}],25:[function(require,module,exports){
+},{"@tvanc/lineclamp":1}],26:[function(require,module,exports){
 const no_events = (logoSrc) => {
     let no_events = document.createElement("div");
     let more_coming = document.createElement("span");
@@ -2198,7 +2216,7 @@ const no_events = (logoSrc) => {
 module.exports = {
     renderNoEvents: no_events
 }
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 const getRibbonData = async (hostId, token) => {
     const ribbonRes = fetch(`https://api.withribbon.com/api/v1/Events?hostId=${hostId}&token=${token}`)
     .then(response => response.json())
@@ -2211,7 +2229,7 @@ const getRibbonData = async (hostId, token) => {
 module.exports = {
     getRibbonData: getRibbonData
 }
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var dayjs = require("dayjs");
 
 const getUniqueDates = (e) => {
@@ -2221,10 +2239,35 @@ const getUniqueDates = (e) => {
     return Array.from(uniqDates);
 }
 
-module.exports = {
-    getUniqueDates: getUniqueDates
+const handleResetButtonReset = (flag) => {
+    let reset_button = document.getElementById("ly_plugin_reset_button");
+
+    if(flag === 1){
+        reset_button.innerHTML = "Showing All Events";
+        reset_button.disabled = true;
+        reset_button.classList.add("opacity-50", "cursor-not-allowed");
+    } else if(flag === 2){
+        reset_button.innerHTML = "Clear Filters";
+        reset_button.disabled = false;
+        reset_button.classList.remove("opacity-50", "cursor-not-allowed");
+    }
 }
-},{"dayjs":2}],28:[function(require,module,exports){
+
+const handleDateSelection = (data) => {
+    //dates are formatted without special characters because it breaks List.js sort
+    let searchDate = dayjs(data.data.date).format("YYYYMMDD");
+
+    lyEventList.search(searchDate, 'searchDate');
+
+    utils.handleResetButtonReset(2);
+}
+
+module.exports = {
+    getUniqueDates: getUniqueDates,
+    handleResetButtonReset: handleResetButtonReset,
+    handleDateSelection: handleDateSelection
+}
+},{"dayjs":2}],29:[function(require,module,exports){
 //dayjs
 var dayjs = require("dayjs");
 var customParseFormat = require('dayjs/plugin/customParseFormat');
@@ -2236,7 +2279,8 @@ var List = require('list.js');
 let { getRibbonData } = require('./components/ribbonapi');
 var modal = require('./components/modal.js');
 var utils = require('./components/utils');
-var no_events = require('./components/noEvents.js')
+var no_events = require('./components/noEvents.js');
+var lc = require('./components/list');
 
 /*
 set list options and build item templates
@@ -2281,15 +2325,6 @@ const initRibbon = async (h,k) => {
     return ribbonData.filter((e) => dayjs(e.dateTime).isAfter(dayjs()));
 }
 
-
-
-const createListStructure = () => {
-    let listHTML = document.createElement("ul");
-    listHTML.classList.add("list");
-
-    document.getElementById("ly_event_plugin").appendChild(listHTML);
-}
-
 /*
 reset button functionality
 */
@@ -2310,34 +2345,11 @@ const buildFilters = (data) => {
     filterContainer.appendChild(createResetButton());
 
     //create teacher filter
-    createTeacherFilter(data, filterContainer);
+    // createTeacherFilter(data, filterContainer);
 
     //append to plugin container
     el.prepend(filterContainer);
 }
-
-// const createTeacherFilter = (data, el) => {
-//     let teacherSet = new Set(),
-//         selectElement = document.createElement('select');
-
-//     data.forEach((e) => {
-//         teacherSet.add(e.teacher);
-//     });
-
-//     let teachArray = Array.from(teacherSet);
-
-//     teachArray.map((t) => {
-//         let opt = document.createElement("option");
-//         opt.value = t;
-//         opt.innerHTML = t;
-
-//         selectElement.appendChild(opt)
-//     });
-
-//     el.appendChild(selectElement);
-
-//     // console.log(teacherSet);
-// }
 
 const createResetButton = () => {
     let resetButton = document.createElement("button");
@@ -2351,25 +2363,11 @@ const createResetButton = () => {
     return resetButton;
 }
 
-const handleResetButtonReset = (flag) => {
-    let reset_button = document.getElementById("ly_plugin_reset_button");
-
-    if(flag === 1){
-        reset_button.innerHTML = "Showing All Events";
-        reset_button.disabled = true;
-        reset_button.classList.add("opacity-50", "cursor-not-allowed");
-    } else if(flag === 2){
-        reset_button.innerHTML = "Clear Filters";
-        reset_button.disabled = false;
-        reset_button.classList.remove("opacity-50", "cursor-not-allowed");
-    }
-}
-
 const handleFilterClear = () => {
     lyEventList.search();
     lyCalendar.reset();
 
-    handleResetButtonReset(1);
+    utils.handleResetButtonReset(1);
 }
 
 /*
@@ -2384,21 +2382,12 @@ const createCalStructure = () => {
     document.getElementById("ly_event_plugin").prepend(calHTML);
 }
 
-const handleDateSelection = (data) => {
-    //dates are formatted without special characters because it breaks List.js sort
-    let searchDate = dayjs(data.data.date).format("YYYYMMDD");
-
-    lyEventList.search(searchDate, 'searchDate');
-
-    handleResetButtonReset(2);
-}
-
 const buildCalendar = (events) => {
     lyCalendar = new VanillaCalendar({
         selector: "#ly_event_cal",
         datesFilter: true,
         availableDates: utils.getUniqueDates(events),
-        onSelect: (data) => handleDateSelection(data)
+        onSelect: (data) => utils.handleDateSelection(data)
     });
 }
 
@@ -2407,7 +2396,7 @@ init functions
 */
 
 //create list & modal elements
-createListStructure();
+lc.createListStructure();
 modal.buildModal();
 
 //get data from ribbon
@@ -2456,7 +2445,7 @@ initRibbon(hostId,token).then((data) => {
         no_events.renderNoEvents(logoSrc);
     }
 });
-},{"./components/modal.js":24,"./components/noEvents.js":25,"./components/ribbonapi":26,"./components/utils":27,"./vendor/vanilla-calendar":29,"dayjs":2,"dayjs/plugin/customParseFormat":3,"list.js":7}],29:[function(require,module,exports){
+},{"./components/list":24,"./components/modal.js":25,"./components/noEvents.js":26,"./components/ribbonapi":27,"./components/utils":28,"./vendor/vanilla-calendar":30,"dayjs":2,"dayjs/plugin/customParseFormat":3,"list.js":7}],30:[function(require,module,exports){
 /*
     Vanilla AutoComplete v0.1
     Copyright (c) 2019 Mauro Marssola
@@ -2660,5 +2649,5 @@ let VanillaCalendar = (function () {
 
 window.VanillaCalendar = VanillaCalendar
 
-},{}]},{},[28])(28)
+},{}]},{},[29])(29)
 });

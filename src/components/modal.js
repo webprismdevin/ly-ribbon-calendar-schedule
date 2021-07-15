@@ -19,8 +19,10 @@ const showModal = (data) => {
     
     let description = document.createElement("p");
     description.innerHTML = data;
+    description.id = "ly_event_description_1"
 
-    modal.appendChild(description);
+    let does_desc_exist = document.getElementById("ly_event_description_1");
+
 
     let closeButton = document.createElement("button");
     closeButton.innerHTML = "&times; close";
@@ -30,7 +32,12 @@ const showModal = (data) => {
         destroyModal();
     });
 
-    modal.appendChild(closeButton);
+    //check if the modal content already exists. Stops "double click" on "read more..."
+    if(does_desc_exist === null){
+        modal.appendChild(description);
+        modal.appendChild(closeButton);
+    }
+
 }
 
 const clampDescriptions = () => {

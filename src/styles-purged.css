@@ -116,8 +116,7 @@ Forms
 2. Remove the margin in Firefox and Safari.
 */
 
-button,
-select {
+button {
   font-family: inherit;
   /* 1 */
   font-size: 100%;
@@ -133,8 +132,7 @@ Remove the inheritance of text transform in Edge and Firefox.
 1. Remove the inheritance of text transform in Firefox.
 */
 
-button,
-select {
+button {
   /* 1 */
   text-transform: none;
 }
@@ -337,8 +335,7 @@ a {
  * normalize.css.
  */
 
-button,
-select {
+button {
   padding: 0;
   line-height: inherit;
   color: inherit;
