@@ -1,11 +1,19 @@
-var vanillaCalendar = require('./vendor/vanilla-calendar');
+//dayjs
 var dayjs = require("dayjs");
 var customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
+//vendor modules
+var vanillaCalendar = require('./vendor/vanilla-calendar');
 var List = require('list.js');
+//custom components
 let { getRibbonData } = require('./components/ribbonapi');
-var LineClamp = require("@tvanc/lineclamp");
+var modal = require('./components/modal.js');
+var utils = require('./components/utils');
+var no_events = require('./components/noEvents.js')
 
+/*
+set list options and build item templates
+*/
 
 let listOptions = {
     valueNames: [ "id", "title", "date", "time", "teacher", "duration", {data: {name: "link", attr: "href"}}, "description", "sort", "month"],
@@ -27,18 +35,26 @@ let listOptions = {
     }
 }
 
-let lyEventList, lyCalendar;
+//global variables for list and calendar
+let lyEventList, lyCalendar, ribbonData;
 
-var hostId = "6014", token = "54ffc5cb91";
+//Ribbon API id & token
+let scriptRootTag = document.getElementById("ly_ribbon_widget_srt");
+let hostId = scriptRootTag.getAttribute("hostId"), 
+// let hostId = "6014", token = "54ffc5cb91",
+    token = scriptRootTag.getAttribute("token"),
+    logoSrc = scriptRootTag.getAttribute("logoSrc");
 
 
-//base functions
+//promise to return data from Ribbon API
 const initRibbon = async (h,k) => {
     let ribbonData = await getRibbonData(h,k);
 
     //return API data, but only return events that are after today
     return ribbonData.filter((e) => dayjs(e.dateTime).isAfter(dayjs()));
 }
+
+
 
 const createListStructure = () => {
     let listHTML = document.createElement("ul");
@@ -47,13 +63,54 @@ const createListStructure = () => {
     document.getElementById("ly_event_plugin").appendChild(listHTML);
 }
 
-const createCalStructure = () => {
-    let calHTML = document.createElement("div");
-    calHTML.id = "ly_event_cal";
-    calHTML.classList.add("vanilla-calendar");
+/*
+reset button functionality
+*/
 
-    document.getElementById("ly_event_plugin").appendChild(calHTML);
+const buildFilterContainer = () => {
+    let filterContainer = document.createElement("div");
+    filterContainer.classList.add("flex-row");
+    filterContainer.id = "ly_filter_container";
+
+    return filterContainer;
 }
+
+const buildFilters = (data) => {
+    let el = document.getElementById("ly_event_plugin");
+    let filterContainer = buildFilterContainer();
+
+    //add reset button to filter container
+    filterContainer.appendChild(createResetButton());
+
+    //create teacher filter
+    // createTeacherFilter(data, filterContainer);
+
+    //append to plugin container
+    el.prepend(filterContainer);
+}
+
+// const createTeacherFilter = (data, el) => {
+//     let teacherSet = new Set(),
+//         selectElement = document.createElement('select');
+
+//     data.forEach((e) => {
+//         teacherSet.add(e.teacher);
+//     });
+
+//     let teachArray = Array.from(teacherSet);
+
+//     teachArray.map((t) => {
+//         let opt = document.createElement("option");
+//         opt.value = t;
+//         opt.innerHTML = t;
+
+//         selectElement.appendChild(opt)
+//     });
+
+//     el.appendChild(selectElement);
+
+//     // console.log(teacherSet);
+// }
 
 const createResetButton = () => {
     let resetButton = document.createElement("button");
@@ -62,9 +119,9 @@ const createResetButton = () => {
     resetButton.disabled = true;
     resetButton.classList.add("shadow", "p-2", "pr-4", "pl-4", "m-4", "opacity-50", "cursor-not-allowed");
 
-    resetButton.addEventListener("click", () => handleFilterClear())
+    resetButton.addEventListener("click", () => handleFilterClear());
 
-    document.getElementById("ly_event_plugin").appendChild(resetButton);
+    return resetButton;
 }
 
 const handleResetButtonReset = (flag) => {
@@ -81,11 +138,23 @@ const handleResetButtonReset = (flag) => {
     }
 }
 
-const getUniqueDates = (e) => {
-    let allDates = e.map((x) => ({date: dayjs(x.dateTime).format("YYYY-MM-DD")}));
-    let uniqDates = new Set(allDates);
+const handleFilterClear = () => {
+    lyEventList.search();
+    lyCalendar.reset();
 
-    return Array.from(uniqDates);
+    handleResetButtonReset(1);
+}
+
+/*
+calendar functionality
+*/
+
+const createCalStructure = () => {
+    let calHTML = document.createElement("div");
+    calHTML.id = "ly_event_cal";
+    calHTML.classList.add("vanilla-calendar");
+
+    document.getElementById("ly_event_plugin").prepend(calHTML);
 }
 
 const handleDateSelection = (data) => {
@@ -95,99 +164,24 @@ const handleDateSelection = (data) => {
     lyEventList.search(searchDate, 'searchDate');
 
     handleResetButtonReset(2);
-
 }
 
 const buildCalendar = (events) => {
     lyCalendar = new VanillaCalendar({
         selector: "#ly_event_cal",
         datesFilter: true,
-        availableDates: getUniqueDates(events),
+        availableDates: utils.getUniqueDates(events),
         onSelect: (data) => handleDateSelection(data)
     });
-
-    // document.getElementById("ly_event_cal").style = "max-width: 450px !important; margin-left: auto";
-
 }
 
-const buildModal = () => {
-    let modal = document.createElement("div");
-    modal.id = "ly_description_modal";
-    modal.classList.add("hidden", "fixed");
-
-    document.body.appendChild(modal);
-}
-
-const destroyModal = () => {
-    document.getElementById("ly_description_modal").remove();
-    buildModal();
-}
-
-const showModal = (data) => {
-    let modal = document.getElementById("ly_description_modal");
-    modal.classList.remove("hidden");
-    
-    let description = document.createElement("p");
-    description.innerHTML = data;
-
-    modal.appendChild(description);
-
-    let closeButton = document.createElement("button");
-    closeButton.innerHTML = "&times; close";
-    closeButton.classList.add("w-full", "cursor-pointer", "text-xl", "text-center", "shadow", "p-2", "mt-4", "mb-4");
-
-    closeButton.addEventListener("click", () => {
-        destroyModal();
-    });
-
-    modal.appendChild(closeButton);
-}
-
-const clampDescriptions = () => {
-    const elements = document.querySelectorAll(".description");
-
-    elements.forEach((element) => {
-        let textToBeClamped = element.innerHTML;
-
-        const clamp = new LineClamp(element, { maxLines: 2 });
-
-        if(clamp.shouldClamp() === true){
-
-            //insert "read more"
-            let readMore = document.createElement("span");
-            readMore.innerHTML = "read more";
-            readMore.classList.add("font-extralight", "cursor-pointer", "ly_desc_readmore");
-            readMore.addEventListener("click",(e) => {
-                showModal(textToBeClamped);
-            });
-
-            element.parentNode.appendChild(readMore);
-
-            clamp.apply();
-        }
-    });
-}
-
-const handleFilterClear = () => {
-    lyEventList.search();
-    lyCalendar.reset();
-
-    handleResetButtonReset(1);
-}
-
-//init functions
-
-// get 'showcalendar' attribute
-let showCalendar = document.getElementById("ly_ribbon_widget_srt").getAttribute('showcalendar') || true;
-
-if(showCalendar === true){
-    createCalStructure();
-    createResetButton();
-}
+/*
+init functions
+*/
 
 //create list & modal elements
 createListStructure();
-buildModal();
+modal.buildModal();
 
 //get data from ribbon
 initRibbon(hostId,token).then((data) => {
@@ -216,14 +210,22 @@ initRibbon(hostId,token).then((data) => {
         else return 1;
     }});
 
-    //no need to build the calendar if it's not going to be shown.
-    if(showCalendar === true){
-        buildCalendar(data);
-    }
-
     //line clamp long descriptions and implement a "read more button"
-    clampDescriptions();
+    modal.clampDescriptions();
+
+    return data
+}).then((data) => {
+    if(data.length > 0){
+        // get 'showcalendar' attribute
+        let showCalendar = document.getElementById("ly_ribbon_widget_srt").getAttribute('showcalendar') || true;
+
+        //no need to build the calendar if it's not going to be shown.
+        if(showCalendar === true){
+            buildFilters(data);
+            createCalStructure();
+            buildCalendar(data);
+        }
+    } else {
+        no_events.renderNoEvents(logoSrc);
+    }
 });
-
-
-

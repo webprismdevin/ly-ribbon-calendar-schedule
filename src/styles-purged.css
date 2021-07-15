@@ -116,7 +116,8 @@ Forms
 2. Remove the margin in Firefox and Safari.
 */
 
-button {
+button,
+select {
   font-family: inherit;
   /* 1 */
   font-size: 100%;
@@ -132,7 +133,8 @@ Remove the inheritance of text transform in Edge and Firefox.
 1. Remove the inheritance of text transform in Firefox.
 */
 
-button {
+button,
+select {
   /* 1 */
   text-transform: none;
 }
@@ -304,6 +306,10 @@ body {
  * https://github.com/tailwindcss/tailwindcss/issues/362
  */
 
+img {
+  border-style: solid;
+}
+
 button {
   cursor: pointer;
 }
@@ -331,7 +337,8 @@ a {
  * normalize.css.
  */
 
-button {
+button,
+select {
   padding: 0;
   line-height: inherit;
   color: inherit;
@@ -361,7 +368,7 @@ button {
  *    https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210
  */
 
-
+img,
 svg {
   display: block;
   /* 1 */
@@ -376,9 +383,48 @@ svg {
  * https://github.com/mozdevs/cssremedy/issues/14
  */
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 *, ::before, ::after {
   --tw-border-opacity: 1;
   border-color: rgba(229, 231, 235, var(--tw-border-opacity));
+}
+
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
 }
 
 .fixed {
@@ -423,6 +469,10 @@ svg {
 
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.flex {
+  display: flex;
 }
 
 .hidden {
@@ -482,6 +532,22 @@ svg {
 
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .p-2 {
