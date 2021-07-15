@@ -21,17 +21,7 @@ const handleResetButtonReset = (flag) => {
     }
 }
 
-const handleDateSelection = (data) => {
-    //dates are formatted without special characters because it breaks List.js sort
-    let searchDate = dayjs(data.data.date).format("YYYYMMDD");
-
-    lyEventList.search(searchDate, 'searchDate');
-
-    utils.handleResetButtonReset(2);
-}
-
 module.exports = {
     getUniqueDates: getUniqueDates,
     handleResetButtonReset: handleResetButtonReset,
-    handleDateSelection: handleDateSelection
 }

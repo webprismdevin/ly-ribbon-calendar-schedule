@@ -2253,19 +2253,9 @@ const handleResetButtonReset = (flag) => {
     }
 }
 
-const handleDateSelection = (data) => {
-    //dates are formatted without special characters because it breaks List.js sort
-    let searchDate = dayjs(data.data.date).format("YYYYMMDD");
-
-    lyEventList.search(searchDate, 'searchDate');
-
-    utils.handleResetButtonReset(2);
-}
-
 module.exports = {
     getUniqueDates: getUniqueDates,
     handleResetButtonReset: handleResetButtonReset,
-    handleDateSelection: handleDateSelection
 }
 },{"dayjs":2}],29:[function(require,module,exports){
 //dayjs
@@ -2382,12 +2372,23 @@ const createCalStructure = () => {
     document.getElementById("ly_event_plugin").prepend(calHTML);
 }
 
+const handleDateSelection = (data) => {
+    //dates are formatted without special characters because it breaks List.js sort
+    let searchDate = dayjs(data.data.date).format("YYYYMMDD");
+
+    lyEventList.search(searchDate, 'searchDate');
+
+    utils.handleResetButtonReset(2);
+}
+
 const buildCalendar = (events) => {
     lyCalendar = new VanillaCalendar({
         selector: "#ly_event_cal",
         datesFilter: true,
         availableDates: utils.getUniqueDates(events),
-        onSelect: (data) => utils.handleDateSelection(data)
+        onSelect: (data) => {
+            handleDateSelection(data)
+        }
     });
 }
 
