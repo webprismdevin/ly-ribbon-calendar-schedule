@@ -12,7 +12,7 @@
     "build": "browserify ./src/index.js | uglifyjs > ./disti/main.js",
     "postbuild": "run-s css:*",
     "css:compile": "cat ./src/css/* > ./src/style_bundle.css",
-    "css:purge": "purgecss --css ./src/style_bundle.css --content ./src/index.js ./src/vendor/vanilla-calendar.js ./src/components/*.js --safelist w-1\/2 --output ./src/styles-purged.css",
+    "css:purge": "purgecss --css ./src/style_bundle.css --content ./src/index.js ./src/vendor/vanilla-calendar.js ./src/components/*.js --safelist w-1\/2 w-1\/6 --output ./src/styles-purged.css",
     "css:minify": "minify ./src/styles-purged.css > ./disti/styles-min.css"
   },
   "author": "",
