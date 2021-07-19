@@ -3,9 +3,12 @@ const no_events = (logoSrc) => {
     let more_coming = document.createElement("span");
     more_coming.innerHTML = "More Events Coming Soon!";
     more_coming.style.textAlign = "center";
+    more_coming.classList.add("text-lg");
 
     let logo = document.createElement("img");
     logo.src = logoSrc;
+
+    logo.classList.add('w-1/6', 'pt-8');
 
     no_events.appendChild(logo);
     no_events.appendChild(more_coming);

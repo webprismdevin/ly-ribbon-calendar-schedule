@@ -448,6 +448,10 @@ img {
   bottom: 1.5rem;
 }
 
+.left-36 {
+  left: 9rem;
+}
+
 .m-4 {
   margin: 1rem;
 }
@@ -474,6 +478,10 @@ img {
 
 .hidden {
   display: none;
+}
+
+.w-1 {
+  width: 0.25rem;
 }
 
 .w-1\/2 {
@@ -559,6 +567,10 @@ img {
   padding: 1.5rem;
 }
 
+.pt-8 {
+  padding-top: 2rem;
+}
+
 .pr-4 {
   padding-right: 1rem;
 }
@@ -573,6 +585,11 @@ img {
 
 .text-right {
   text-align: right;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .text-xl {

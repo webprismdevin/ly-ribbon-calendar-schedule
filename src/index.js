@@ -17,12 +17,17 @@ set list options and build item templates
 */
 
 let listOptions = {
-    valueNames: [ "id", "title", "date", "time", "teacher", "duration", {data: {name: "link", attr: "href"}}, "description", "sort", "month"],
+    valueNames: [ "id", "title", "date", "time", "teacher", "duration", {data: {name: "link", attr: "href"}}, "description", "sort", "month", "img1"],
     item: function(values) {
         //dates are formatted without special characters because it breaks List.js sort
         return `<li class="shadow p-6 relative mt-4" id="${values.id}">
-                    <span>${dayjs(values.date, "YYYYMMDD").format("dddd D MMM YYYY")} at ${values.time}</span>
-                    <h1 class="title text-xl mt-1"></h1>
+                    <div>
+                        <img src="${values.img1}" alt="class image for ${values.title}" height="100px" width="100px">
+                    </div>
+                    <div class="absolute top-6 left-36">
+                        <span>${dayjs(values.date, "YYYYMMDD").format("dddd D MMM YYYY")} at ${values.time}</span>
+                        <h1 class="title text-xl mt-1"></h1>
+                    </div>
                     <div class="text-right absolute top-6 right-6 ly_teacher_duration font-light">
                         <span>Taught by: </span><span class="teacher"></span><br>
                         <span class="duration"></span><span> Minutes</span>
@@ -42,7 +47,7 @@ let lyEventList, lyCalendar, ribbonData;
 //Ribbon API id & token
 let scriptRootTag = document.getElementById("ly_ribbon_widget_srt");
 let hostId = scriptRootTag.getAttribute("hostId"), 
-// let hostId = "6014", token = "54ffc5cb91",
+// let hostId = "2916", token = "7e60c8022c",
     token = scriptRootTag.getAttribute("token"),
     logoSrc = scriptRootTag.getAttribute("logoSrc");
 
@@ -145,6 +150,8 @@ initRibbon(hostId,token).then((data) => {
     let newData = data.map((d) => {
         //creates custom format so List.js can search by date on calendar events
         let searchDate = dayjs(d.dateTime).format("YYYYMMDD").toString();
+
+        console.log(d.image1)
         
         return ({   id: d.id,
                     title: d.title, 
@@ -154,7 +161,8 @@ initRibbon(hostId,token).then((data) => {
                     teacher: d.teacher, 
                     duration: d.duration,
                     link: d.link,
-                    description: d.description
+                    description: d.description,
+                    img1: d.image1 === null ? logoSrc : d.image1
                 });
 
     })
